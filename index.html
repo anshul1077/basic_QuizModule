@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Quiz App</title>
+<style>
+    body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 50px;
+    box-sizing: border-box;
+    background-color: black;
+}
+
+.quiz-container {
+    max-width: 600px;
+    margin: 20px auto;
+    padding: 85px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    text-align: center;
+    background-color: blueviolet;
+    font-size: 30px;
+}
+
+.question-container {
+    font-size: 18px;
+    margin-bottom: 10px;
+    font-size: 40px;
+}
+
+.options-container {
+    margin-bottom: 20px;
+    margin-top: 24px;
+}
+
+button {
+    padding: 15px 20px;
+    margin-right: 10px;
+    cursor: pointer;
+    background-color: rgb(196, 184, 184);
+    text-align: center;
+    font-size: 29px;
+}
+
+.next-btn {
+    display: none;
+   
+}
+
+.result {
+    font-weight: bold;
+    margin-bottom: 10px;
+    display: none;
+}
+.submit-btn {
+    background-color: lightseagreen;
+}
+.next-btn {
+    background-color: lightseagreen;
+}
+.restart-btn {
+    background-color: lightseagreen;
+}
+
+</style>
+</head>
+<body>
+<div class="quiz-container">
+    <div id="question-container" class="question-container"></div>
+    <div id="options-container" class="options-container"></div>
+    <button id="next-btn" class="next-btn">Next</button>
+    <button id="submit-btn" class="submit-btn">Submit</button>
+    <button id="restart-btn" class="restart-btn">Restart</button>
+    <p id="result" class="result"></p>
+</div>
+<script>
+    const questions = [
+    {
+        question: "What is the capital of France?",
+        options: ["Paris", "London", "Berlin", "Madrid"],
+        answer: "Paris",
+        score: 5
+    },
+    {
+        question: "Which planet is known as the Red Planet?",
+        options: ["Jupiter", "Mars", "Saturn", "Venus"],
+        answer: "Mars",
+        score: 10
+    },
+    // Add more questions here
+];
+
+let currentQuestion = 0;
+let score = 0;
+
+const questionContainer = document.getElementById("question-container");
+const optionsContainer = document.getElementById("options-container");
+const nextButton = document.getElementById("next-btn");
+const submitButton = document.getElementById("submit-btn");
+
+const restartButton = document.getElementById("restart-btn");
+const resultText = document.getElementById("result");
+
+function showQuestion(questionIndex) {
+    const currentQuestionData = questions[questionIndex];
+    questionContainer.innerText = currentQuestionData.question;
+
+    optionsContainer.innerHTML = "";
+    currentQuestionData.options.forEach((option, index) => {
+        const optionButton = document.createElement("button");
+        optionButton.innerText = option;
+        optionButton.addEventListener("click", () => {
+            checkAnswer(option, currentQuestionData.answer, currentQuestionData.score);
+        });
+        optionsContainer.appendChild(optionButton);
+    });
+}
+
+function checkAnswer(selectedAnswer, correctAnswer, questionScore) {
+    if (selectedAnswer === correctAnswer) {
+        score += questionScore;
+        resultText.innerText = "Correct!";
+    } else {
+        resultText.innerText = "Incorrect!";
+    }
+
+    resultText.style.display = "block";
+    submitButton.style.display = "none";
+    nextButton.style.display = "inline-block";
+
+    disableOptions();
+}
+
+function disableOptions() {
+    const optionButtons = document.querySelectorAll(".options-container button");
+    optionButtons.forEach(button => {
+        button.disabled = true;
+    });
+}
+
+function nextQuestion() {
+    currentQuestion++;
+    if (currentQuestion < questions.length) {
+        showQuestion(currentQuestion);
+        resultText.style.display = "none";
+        nextButton.style.display = "none";
+        submitButton.style.display = "inline-block";
+    } else {
+        showResult();
+    }
+}
+
+function showResult() {
+    questionContainer.innerText = "";
+    optionsContainer.innerHTML = "";
+    resultText.innerText = `Your score is ${score}`;
+    resultText.style.display = "block";
+    restartButton.style.display = "inline-block";
+}
+
+function restartQuiz() {
+    currentQuestion = 0;
+    score = 0;
+    resultText.style.display = "none";
+    restartButton.style.display = "none";
+    showQuestion(currentQuestion);
+}
+
+submitButton.addEventListener("click", () => {
+    const selectedOption = document.querySelector(".options-container button:checked");
+    if (!selectedOption) {
+        alert("Please select an option");
+    } else {
+        submitButton.disabled = true;
+        const selectedAnswer = selectedOption.innerText;
+        const correctAnswer = questions[currentQuestion].answer;
+        checkAnswer(selectedAnswer, correctAnswer, questions[currentQuestion].score);
+    }
+});
+
+nextButton.addEventListener("click", nextQuestion);
+restartButton.addEventListener("click", restartQuiz);
+
+showQuestion(currentQuestion);
+
+</script>
+</body>
+</html>
